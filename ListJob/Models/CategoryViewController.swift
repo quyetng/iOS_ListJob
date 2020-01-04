@@ -35,6 +35,18 @@ class CategoryViewController: UITableViewController {
         return cell
         
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        print("prepare")
+        let destinationVC = segue.destination as! ItemViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categories?[indexPath.row]
+        }
+    }
     @IBAction func buttonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -63,7 +75,7 @@ class CategoryViewController: UITableViewController {
     
     func saveCatogories(category: Category) {
         do {
-            try! realm.write {
+            try realm.write {
                 realm.add(category)
             }
         } catch {
