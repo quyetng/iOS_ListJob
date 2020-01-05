@@ -25,6 +25,10 @@ class ItemViewController: UITableViewController {
         // Do any additional setup after loading the view.
         loadItem();
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        title = selectedCategory!.title
+    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todoItems?.count ?? 1
