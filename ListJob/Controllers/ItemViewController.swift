@@ -35,9 +35,17 @@ class ItemViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        print("cellForRowAt")
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath)
+        print("indexPath.row = \(indexPath.row)")
         
-        cell.textLabel?.text = todoItems?[indexPath.row].title ?? "No items added yet"
+        if let item = todoItems?[indexPath.row] {
+            cell.textLabel?.text = todoItems?[indexPath.row].title
+        } else {
+            cell.textLabel?.text = "No items added yet"
+        }
+        
+        //cell.textLabel?.text = todoItems?[indexPath.row].title ?? "No items added yet"
         return cell
     }
     
@@ -48,10 +56,21 @@ class ItemViewController: UITableViewController {
         let alert = UIAlertController(title: "Add new Item", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            let newItem = Item()
-            newItem.title = textField.text!
             
-            self.saveItem(item: newItem)
+            if let currentCat = self.selectedCategory {
+                
+                do {
+                    try self.realm.write {
+                        let newItem = Item()
+                        newItem.title = textField.text!
+                        currentCat.items.append(newItem)
+                    }
+                } catch {
+                    print("Error saving new items, \(error)")
+                }
+                
+                
+            }
             
             self.tableView.reloadData()
             
@@ -79,7 +98,8 @@ class ItemViewController: UITableViewController {
     }
     func loadItem() {
     
-        todoItems = realm.objects(Item.self)
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        print(todoItems)
         tableView.reloadData()
     }
 }
